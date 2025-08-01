@@ -132,12 +132,33 @@ class HNAIVisualizer {
         const title = story.title || '';
         const text = story.text ? this.stripHtml(story.text) : '';
         const url = story.url || '';
+        const author = story.by || 'unknown';
+        const score = story.score || 0;
+        const comments = story.descendants || 0;
         
-        return `Create an interactive web application based on this Hacker News post:
+        return `Create a comprehensive, immersive web application based on this Hacker News post. The application should deeply engage with the post's topic and provide rich, interactive experiences.
+
+POST DETAILS:
 Title: ${title}
-Text: ${text}
+Author: ${author}
+Score: ${score} points
+Comments: ${comments} total
 URL: ${url}
-The app should be visually engaging and relevant to the topic. Include animations and modern design.`;
+Content: ${text}
+
+REQUIREMENTS:
+1. Create a unique, theme-appropriate experience that reflects the post's essence
+2. Include smooth animations and micro-interactions
+3. Design for both desktop and mobile
+4. Add contextual elements that relate to the post's domain/topic
+5. Include interactive data visualizations where relevant
+6. Implement engaging user interactions
+7. Use modern web technologies and best practices
+8. Make it feel alive and dynamic, not static
+
+STYLE: Modern, clean, with subtle gradients and smooth transitions. Consider the emotional tone of the post's topic.
+
+FOCUS: Create something that would make users want to explore and interact with the content, not just read it passively.`;
     }
 
     stripHtml(html) {
@@ -158,31 +179,52 @@ The app should be visually engaging and relevant to the topic. Include animation
         let css = '';
         let js = '';
         let attempts = 0;
-        const maxAttempts = 3;
+        const maxAttempts = 5;
 
         while (attempts < maxAttempts) {
             try {
-                // Generate HTML
-                this.updateStatus('html', 'working', 'Generating HTML...');
-                html = await this.generateHTML(prompt);
-                this.updateStatus('html', 'completed', 'HTML generated ✓');
+                // Deep content analysis
+                this.updateStatus('analyze', 'working', 'Analyzing post content...');
+                const analysis = await this.analyzeContent(prompt);
+                this.updateStatus('analyze', 'completed', 'Content analyzed ✓');
 
-                // Generate CSS
-                this.updateStatus('css', 'working', 'Designing CSS...');
-                css = await this.generateCSS(prompt, html);
-                this.updateStatus('css', 'completed', 'CSS designed ✓');
+                // Concept development
+                this.updateStatus('concept', 'working', 'Developing concept...');
+                const concept = await this.developConcept(prompt, analysis);
+                this.updateStatus('concept', 'completed', 'Concept developed ✓');
 
-                // Generate JS
-                this.updateStatus('js', 'working', 'Adding JavaScript...');
-                js = await this.generateJS(prompt, html, css);
-                this.updateStatus('js', 'completed', 'JavaScript added ✓');
+                // Generate HTML with structure
+                this.updateStatus('html', 'working', 'Creating structure...');
+                html = await this.generateStructuredHTML(prompt, concept);
+                html = html.replace(/```html/g, '').replace(/```/g, '').trim();
+                this.updateStatus('html', 'completed', 'Structure created ✓');
+
+                // Generate CSS with enhanced styling
+                this.updateStatus('css', 'working', 'Designing experience...');
+                css = await this.generateEnhancedCSS(prompt, html, concept);
+                css = css.replace(/```css/g, '').replace(/```/g, '').trim();
+                this.updateStatus('css', 'completed', 'Experience designed ✓');
+
+                // Generate JS with interactions
+                this.updateStatus('js', 'working', 'Adding interactivity...');
+                js = await this.generateRichJS(prompt, html, css, concept);
+                js = js.replace(/```javascript/g, '').replace(/```js/g, '').replace(/```/g, '').trim();
+                this.updateStatus('js', 'completed', 'Interactivity added ✓');
+
+                // Enhance with additional features
+                this.updateStatus('enhance', 'working', 'Enhancing & optimizing...');
+                const enhanced = await this.enhanceApplication(html, css, js, concept);
+                html = enhanced.html || html;
+                css = enhanced.css || css;
+                js = enhanced.js || js;
+                this.updateStatus('enhance', 'completed', 'Optimized ✓');
 
                 // Test
-                this.updateStatus('test', 'working', 'Testing application...');
+                this.updateStatus('test', 'working', 'Testing experience...');
                 const success = await this.testApplication(html, css, js);
                 
                 if (success) {
-                    this.updateStatus('test', 'completed', 'Application ready ✓');
+                    this.updateStatus('test', 'completed', 'Experience ready ✓');
                     this.renderApplication(html, css, js);
                     return;
                 }
@@ -193,7 +235,6 @@ The app should be visually engaging and relevant to the topic. Include animation
                 this.logError(`Attempt ${attempts + 1} failed: ${error.message}`);
                 
                 if (attempts < maxAttempts - 1) {
-                    // Fix errors
                     const fix = await this.fixError(error, html, css, js);
                     html = fix.html || html;
                     css = fix.css || css;
@@ -207,34 +248,64 @@ The app should be visually engaging and relevant to the topic. Include animation
         this.showErrorFallback();
     }
 
-    async generateHTML(prompt) {
+    async analyzeContent(prompt) {
         const completion = await websim.chat.completions.create({
             messages: [
-                { role: 'system', content: 'Generate complete HTML for an interactive web application. Include modern CSS and JavaScript. Return only valid HTML.' },
+                { role: 'system', content: 'Analyze the Hacker News post and return a JSON object with: {"topic": "main topic", "domain": "technical domain", "mood": "emotional tone", "interaction": "best interaction type", "visual": "visual theme"}' },
                 { role: 'user', content: prompt }
             ]
         });
-        return completion.content;
+        return JSON.parse(completion.content);
     }
 
-    async generateCSS(prompt, html) {
+    async developConcept(prompt, analysis) {
         const completion = await websim.chat.completions.create({
             messages: [
-                { role: 'system', content: 'Generate modern, beautiful CSS for this application. Include animations and responsive design. Return only CSS.' },
-                { role: 'user', content: `HTML: ${html}\nPrompt: ${prompt}` }
+                { role: 'system', content: 'Develop a detailed concept for the interactive application based on the analysis. Return JSON with: {"concept": "app concept", "features": ["feature1", "feature2"], "colorScheme": "color palette", "animations": ["animation1", "animation2"]}' },
+                { role: 'user', content: `Analysis: ${JSON.stringify(analysis)}\nPrompt: ${prompt}` }
+            ]
+        });
+        return JSON.parse(completion.content);
+    }
+
+    async generateStructuredHTML(prompt, concept) {
+        const completion = await websim.chat.completions.create({
+            messages: [
+                { role: 'system', content: `Generate complete, structured HTML for an interactive web application. Focus on semantic markup and accessibility. Include modern web components. Return only valid HTML without markdown.` },
+                { role: 'user', content: `Concept: ${JSON.stringify(concept)}\nPrompt: ${prompt}` }
             ]
         });
         return completion.content;
     }
 
-    async generateJS(prompt, html, css) {
+    async generateEnhancedCSS(prompt, html, concept) {
         const completion = await websim.chat.completions.create({
             messages: [
-                { role: 'system', content: 'Generate interactive JavaScript for this application. Include modern ES6+ features. Return only JavaScript.' },
-                { role: 'user', content: `HTML: ${html}\nCSS: ${css}\nPrompt: ${prompt}` }
+                { role: 'system', content: `Generate sophisticated CSS with modern features: CSS Grid, Flexbox, custom properties, animations, and responsive design. Include dark mode support. Return only CSS without markdown.` },
+                { role: 'user', content: `HTML: ${html}\nConcept: ${JSON.stringify(concept)}\nPrompt: ${prompt}` }
             ]
         });
         return completion.content;
+    }
+
+    async generateRichJS(prompt, html, css, concept) {
+        const completion = await websim.chat.completions.create({
+            messages: [
+                { role: 'system', content: `Generate rich JavaScript with modern ES6+ features, async/await, and smooth animations. Include error handling and performance optimizations. Return only JavaScript without markdown.` },
+                { role: 'user', content: `HTML: ${html}\nCSS: ${css}\nConcept: ${JSON.stringify(concept)}\nPrompt: ${prompt}` }
+            ]
+        });
+        return completion.content;
+    }
+
+    async enhanceApplication(html, css, js, concept) {
+        const completion = await websim.chat.completions.create({
+            messages: [
+                { role: 'system', content: 'Enhance the application by adding polish: micro-animations, hover effects, loading states, and responsive improvements. Return JSON with enhanced code.' },
+                { role: 'user', content: `Current: ${JSON.stringify({html, css, js})}\nConcept: ${JSON.stringify(concept)}` }
+            ]
+        });
+        return JSON.parse(completion.content);
     }
 
     async testApplication(html, css, js) {
@@ -302,15 +373,28 @@ The app should be visually engaging and relevant to the topic. Include animation
     renderApplication(html, css, js) {
         const fullHTML = `
             <!DOCTYPE html>
-            <html>
+            <html lang="en">
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>${css}</style>
+                <style>
+                    * { box-sizing: border-box; }
+                    body { 
+                        margin: 0; 
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                        line-height: 1.6;
+                    }
+                    ${css}
+                </style>
             </head>
             <body>
                 ${html}
-                <script>${js}</script>
+                <script>
+                    (function() {
+                        'use strict';
+                        ${js}
+                    })();
+                </script>
             </body>
             </html>
         `;
@@ -322,10 +406,24 @@ The app should be visually engaging and relevant to the topic. Include animation
 
     updateStatus(stage, state, text) {
         const indicator = document.querySelector(`[data-stage="${stage}"]`);
+        if (!indicator) return;
+        
         const textEl = indicator.nextElementSibling;
         
-        indicator.textContent = state === 'completed' ? '✅' : '⏳';
-        indicator.className = `status-indicator ${state}`;
+        if (state === 'completed') {
+            indicator.textContent = '✅';
+            indicator.className = 'status-indicator completed';
+            textEl.style.color = '#4CAF50';
+        } else if (state === 'working') {
+            indicator.textContent = '🔄';
+            indicator.className = 'status-indicator working';
+            textEl.style.color = '#ff6600';
+        } else if (state === 'error') {
+            indicator.textContent = '❌';
+            indicator.className = 'status-indicator error';
+            textEl.style.color = '#f44336';
+        }
+        
         textEl.textContent = text;
     }
 
@@ -347,4 +445,3 @@ The app should be visually engaging and relevant to the topic. Include animation
 
 // Initialize the app
 new HNAIVisualizer();
-
