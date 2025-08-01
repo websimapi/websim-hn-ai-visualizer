@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HN AI Visualizer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Hacker News <span class="ai-badge">AI Visualizer</span></h1>
+            <nav>
+                <button class="nav-btn active" data-type="top">Top</button>
+                <button class="nav-btn" data-type="new">New</button>
+                <button class="nav-btn" data-type="ask">Ask</button>
+                <button class="nav-btn" data-type="show">Show</button>
+                <button class="nav-btn" data-type="jobs">Jobs</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading stories...</p>
+        </div>
+        <div id="stories" class="stories"></div>
+    </main>
+
+    <div id="app-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">AI Generated App</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="app-container" class="app-container">
+                    <div id="ai-status" class="ai-status">
+                        <div class="status-item">
+                            <span class="status-indicator" data-stage="html">⏳</span>
+                            <span class="status-text">Generating HTML...</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-indicator" data-stage="css">⏳</span>
+                            <span class="status-text">Designing CSS...</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-indicator" data-stage="js">⏳</span>
+                            <span class="status-text">Adding JavaScript...</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-indicator" data-stage="test">⏳</span>
+                            <span class="status-text">Testing...</span>
+                        </div>
+                    </div>
+                    <iframe id="app-iframe" style="display: none;"></iframe>
+                </div>
+                <div id="error-log" class="error-log" style="display: none;">
+                    <h3>AI Debugging Log</h3>
+                    <div id="error-messages"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
+
