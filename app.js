@@ -400,8 +400,11 @@ FOCUS: Create something that would make users want to explore and interact with 
         `;
         
         this.iframe.srcdoc = fullHTML;
-        this.aiStatus.style.display = 'none';
         this.iframe.style.display = 'block';
+        
+        // Make AI status smaller but keep it visible
+        this.aiStatus.style.height = 'auto';
+        this.aiStatus.style.overflow = 'auto';
     }
 
     updateStatus(stage, state, text) {
@@ -436,7 +439,6 @@ FOCUS: Create something that would make users want to explore and interact with 
     }
 
     showErrorFallback() {
-        this.aiStatus.style.display = 'none';
         this.errorLog.style.display = 'block';
         document.getElementById('error-messages').innerHTML += 
             '<p>Failed to generate application. Please try again.</p>';
